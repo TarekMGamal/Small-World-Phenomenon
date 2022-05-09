@@ -19,5 +19,10 @@ namespace Actor
         {
             return name;
         }
+
+        public void SetName(string name)
+        {
+            this.name = name;
+        }
     }
 }
