@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,27 +11,18 @@ namespace Program
     {
         static void Main(string[] args)
         {
-            string tempMovieData = ReadMoviesFile();
-            List<Movie.Movie> movieData = GetListOfMovies(tempMovieData);
-        
+            string fileName = "../../../Testcases/Sample/movies1.txt";
 
-            foreach (var movie in movieData)
-            {
-                Console.Write(movie.GetName() + ": ");
-                foreach (var actor in movie.GetActorList())
-                {
-                    Console.Write(actor.GetName() + " ");
-                }
-                Console.WriteLine();
-            }
+            string tempMovieData = ReadMoviesFile(fileName);
+            Dictionary<string, List<Edge.Edge>> AdjList = GetAdjList(tempMovieData);
+
+            
         }
 
-        static string ReadMoviesFile()
+        static string ReadMoviesFile(string fileName)
         {
-            string fileName = "../../../Testcases/Sample/movies1.txt";
-            
-            FileStream file = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-            StreamReader sr = new StreamReader(file);
+            FileStream file = new(fileName, FileMode.Open, FileAccess.Read);
+            StreamReader sr = new(file);
 
             string moviesData = sr.ReadToEnd();
             
@@ -40,42 +32,45 @@ namespace Program
             return moviesData;
         }
 
-        static List<Movie.Movie> GetListOfMovies(string moviesData)
+        
+        static Dictionary<string, List<Edge.Edge>> GetAdjList(string moviesData)
         {
             string[] movies = moviesData.Split("\n");
-            List<Movie.Movie> listOfMovies = new List<Movie.Movie>();
+            Dictionary<string, List<Edge.Edge>> AdjList = new();
 
 
             for (int i = 0; i < movies.Length; i++)
             {
                 string[] movieData = movies[i].Split('/');
-                bool isFirstItem = true;
-                string movieName = "";
-                List<Actor.Actor> actorsList = new List<Actor.Actor>();
-                
 
-                for (int j = 0; j < movieData.Length; j++)
+                string movieName = movieData[0];
+
+                for (int j = 1; j < movieData.Length; j++)
                 {
-                    if (isFirstItem == true)
+                    for (int k = j+1; k < movieData.Length; k++)
                     {
-                        movieName = movieData[j];
-                        isFirstItem = false;
-                    }
-                    else
-                    {
-                        string actorName = movieData[j];
-                        Actor.Actor actor = new Actor.Actor(actorName);
-                        actorsList.Add(actor);
+                        string u = movieData[j];
+                        string v = movieData[k];
+
+                        Edge.Edge edge1 = new(u, v, movieName);
+                        Edge.Edge edge2 = new(v, u, movieName);
+
+                        if (!AdjList.ContainsKey(u))
+                        {
+                            AdjList.Add(u, new List<Edge.Edge>());
+                        }
+                        if (!AdjList.ContainsKey(v))
+                        {
+                            AdjList.Add(v, new List<Edge.Edge>());
+                        }
+
+                        AdjList[u].Add(edge1);
+                        AdjList[v].Add(edge2);
                     }
                 }
-
-                Movie.Movie movie = new Movie.Movie(movieName, actorsList);
-                listOfMovies.Add(movie);
             }
 
-            listOfMovies.RemoveAt(listOfMovies.Count - 1);
-
-            return listOfMovies;
+            return AdjList;
         }
     }
 }
