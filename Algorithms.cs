@@ -8,94 +8,131 @@ namespace Algorithms
 {
     internal static class Algorithms
     {
-        static int VisIndex;
-        static Dictionary<string, List<string>> AdjList;
-        static Dictionary<string, bool> IsActor;
-        static Dictionary<string, int> Visited;
+        static string finalMovie;
+        static int inf = (int)1e9;
+        static Dictionary<string, List<(string, string)>> AdjList;
+        static Dictionary<string, string> PrevNode;
+        static Dictionary<string, string> PrevMovie;
         static Dictionary<string, int> Distance;
-        static Dictionary<string, string> Prev;
+        static Dictionary<string, int> Strength;
+        static Dictionary<(string, string), int> DirectStrength;
+        
 
-        public static void Prepare(Dictionary<string, List<string>> adjList,
-                                   Dictionary<string, bool> isActor,
-                                   Dictionary<string, int> visited,
-                                   Dictionary<string, int> dis,
-                                   Dictionary<string, string> pre)
+        public static void Prepare(Dictionary<string, List<(string, string)>> adjList, Dictionary<(string, string), int> strength)
         {
-            VisIndex = 0;
             AdjList = adjList;
-            IsActor = isActor;
-            Distance = dis;
-            Prev = pre;
-            Visited = visited;
+            DirectStrength = strength;
         }
 
-        private static int Bfs(string node, string dest)
+        private static (int, int) Dijk(string source, string destination)
         {
-            Visited[node] = VisIndex;
-            Distance[node] = 0;
+            var Pq = new C5.IntervalHeap<(int, int, string, string)>();
+            Pq.Add((0, 0, source, ""));
 
-            Queue<string> queue = new();
-            queue.Enqueue(node);
-            
-            while (queue.Count > 0)
+            Distance.Add(source, 0);
+            Distance.Add(destination, inf);
+            Strength.Add(source, 0);
+
+            while (Pq.Count > 0)
             {
-                node = queue.Dequeue();
-                  
-                if (node == dest)
+                var tmp = Pq.DeleteMin();
+
+                string node = tmp.Item3;
+                string nodeMovieName = tmp.Item4;
+                int curDegree = tmp.Item1;
+                int curStrength = -tmp.Item2;
+
+                if (node == destination)
                 {
-                    return Distance[dest];
+                    finalMovie = nodeMovieName;
+                    break;
                 }
-
-                foreach(var child in AdjList[node])
+                if (curDegree > Distance[node] || curDegree > Distance[destination]) continue;
+                
+                foreach (var entry in AdjList[node])
                 {
-                    if (Visited[child] == VisIndex) continue;
+                    string child = entry.Item1;
+                    string childMovieName = entry.Item2;
 
-                    Visited[child] = VisIndex;
+                    int newDegree = curDegree + 1;
+                    int newStrength = curStrength + DirectStrength[(node, child)];
 
-                    Distance[child] = Distance[node];
-                    if (!IsActor[node]) Distance[child]++;
+                    if (!Distance.ContainsKey(child)) Distance.Add(child, inf);
+                    if (!Strength.ContainsKey(child)) Strength.Add(child, 0);
+                    
+                    if (newDegree < Distance[child] || (newDegree == Distance[child] && newStrength > Strength[child]))
+                    {
+                        var temp = (newDegree, -newStrength, child, childMovieName);
+                        Pq.Add(temp);
 
-                    Prev[child] = node;
+                        Distance[child] = newDegree;
+                        Strength[child] = newStrength;
 
-                    queue.Enqueue(child);
+                        if (!PrevNode.ContainsKey(child)) PrevNode.Add(child, "");
+                        PrevNode[child] = node;
+
+                        if (!PrevMovie.ContainsKey(childMovieName)) PrevMovie.Add(childMovieName, "");
+                        PrevMovie[childMovieName] = nodeMovieName;
+                    }
                 }
             }
 
-            return 0;
+            return (Distance[destination], Strength[destination]);
         }
 
-        private static List<string> GetPath(string actor1, string actor2)
+        private static (List<string>, List<string>) GetPath(string actor1, string actor2)
         {
-            List<string> path = new();
-            string node = actor2;
+            List<string> moviesPath = new();
+            List<string> actorsPath = new();
 
+            string node = actor2;
+            string movie = finalMovie;
+            
             do
             {
-                if (!IsActor[node])
-                {
-                    path.Add(node);
-                }
-                node = Prev[node];
+                if (node == "") break;
+                
+                actorsPath.Add(node);
+
+                if (!PrevNode.ContainsKey(node)) PrevNode.Add(node, "");
+                node = PrevNode[node];
             }
-            while (node != actor1);
+            while (true);
             
-            return path;
+            do
+            {
+                if (movie == "") break;
+                
+                moviesPath.Add(movie);
+
+                if (!PrevMovie.ContainsKey(movie)) PrevMovie.Add(movie, "");
+                movie = PrevMovie[movie];
+            }
+            while (true);
+            
+
+            actorsPath.Reverse();
+            moviesPath.Reverse();
+            
+            return (actorsPath, moviesPath);
         }
 
-        private static int GetStrength()
+        public static (int, int, List<string>, List<string>) Query(string actor1, string actor2)
         {
-            // Todo
-            return 0;
-        }
+            Distance = new();
+            Strength = new();
+            PrevMovie = new();
+            PrevNode = new();
 
-        public static (int, int, List<string>) Query(string actor1, string actor2)
-        {
-            VisIndex++;
-            int degree = Bfs(actor1, actor2);
-            int strength = GetStrength();
-            List<string> path = GetPath(actor1, actor2);
+            (int, int) ans = Dijk(actor1, actor2);
+            int degree = ans.Item1;
+            int strength = ans.Item2;
+            
+            (List<string>, List<string>) paths = GetPath(actor1, actor2);
+            List<string> actorsPath = paths.Item1;
+            List<string> moviesPath = paths.Item2;
 
-            return (degree, strength, path);
+            return (degree, strength, actorsPath, moviesPath);
         }
     }
 }

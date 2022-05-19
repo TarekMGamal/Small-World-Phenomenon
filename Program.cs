@@ -5,103 +5,231 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Program
 {
     public class Program
     {
-        static Dictionary<string, List<string>> AdjList;
-        static Dictionary<string, bool> isActor;
-        static Dictionary<string, int> vis;
-        static Dictionary<string, int> dis;
-        static Dictionary<string, string> pre;
+        static Dictionary<string, List<(string, string)>> AdjList;
+        static Dictionary<(string, string) , int> Strength;
 
         static void Main(string[] args)
         {
-            AdjList = new();
-            isActor = new();
-            vis = new();
-            dis = new();
-            pre = new();
-
-            string fileName = "../../../Testcases/Sample/movies1.txt";
+            double timeBefore = 0, timeAfter = 0;
+            bool yes = false;
             
-            string tempMovieData = ReadMoviesFile(fileName);
-            Prepare(tempMovieData);
-
-            Algorithms.Algorithms.Prepare(AdjList, isActor, vis, dis, pre);
-
-            (int, int, List<string>) x = Algorithms.Algorithms.Query("A", "B");
-            Console.Write(x.Item1 + " ");
-            Console.Write(x.Item2 + " ");
-            Console.Write(x.Item3.Count + " ");
-            Console.WriteLine();
-            for (int i = 0; i < x.Item3.Count; i++)
+            Console.WriteLine("Small-World Phenomenon:\n[1] sample\n[2] small\n[3] medium\n[4] large\n[5] extreme\n");
+            Console.Write("Enter your choice [1-2-3-4-5]: ");
+            char choice = Console.ReadLine()[0];
+            switch (choice)
             {
-                Console.WriteLine(x.Item3[i]);
+                case '1':
+                    timeBefore = System.Environment.TickCount;
+                    Preproccess("../../../Testcases/hbd.txt");
+                    yes |= Check("../../../Testcases/q.txt", "../../../Testcases/ans.txt");
+                    //Console.WriteLine("Not implemented yet\n");
+                    timeAfter = System.Environment.TickCount;
+                    break;
+                case '2':
+                    timeBefore = System.Environment.TickCount;
+                    Preproccess("../../../Testcases/Complete/small/Case1/Movies193.txt");
+                    yes |= Check("../../../Testcases/Complete/small/Case1/queries110.txt", "../../../Testcases/Complete/small/Case1/Solution/queries110 - Solution.txt");
+                    Preproccess("../../../Testcases/Complete/small/Case2/Movies187.txt");
+                    yes |= Check("../../../Testcases/Complete/small/Case2/queries50.txt", "../../../Testcases/Complete/small/Case2/Solution/queries50 - Solution.txt");
+                    timeAfter = System.Environment.TickCount;
+                    break;
+                case '3':
+                    timeBefore = System.Environment.TickCount;
+                    Preproccess("../../../Testcases/Complete/medium/Case1/Movies967.txt");
+                    yes |= Check("../../../Testcases/Complete/medium/Case1/queries4000.txt", "../../../Testcases/Complete/medium/Case1/Solutions/queries4000 - Solution.txt");
+                    yes |= Check("../../../Testcases/Complete/medium/Case1/queries85.txt", "../../../Testcases/Complete/medium/Case1/Solutions/queries85 - Solution.txt");
+                    Preproccess("../../../Testcases/Complete/medium/Case2/Movies4736.txt");
+                    yes |= Check("../../../Testcases/Complete/medium/Case2/queries2000.txt", "../../../Testcases/Complete/medium/Case2/Solutions/queries2000 - Solution.txt");
+                    yes |= Check("../../../Testcases/Complete/medium/Case2/queries110.txt", "../../../Testcases/Complete/medium/Case2/Solutions/queries110 - Solution.txt");
+                    timeAfter = System.Environment.TickCount;
+                    break;
+                case '4':
+                    timeBefore = System.Environment.TickCount;
+                    Preproccess("../../../Testcases/Complete/large/Movies14129.txt");
+                    yes |= Check("../../../Testcases/Complete/large/queries26.txt", "../../../Testcases/Complete/large/Solutions/queries26 - Solution.txt");
+                    yes |= Check("../../../Testcases/Complete/large/queries600.txt", "../../../Testcases/Complete/large/Solutions/queries600 - Solution.txt");
+                    timeAfter = System.Environment.TickCount;
+                    break;
+                case '5':
+                    timeBefore = System.Environment.TickCount;
+                    Preproccess("../../../Testcases/Complete/extreme/Movies122806.txt");
+                    //yes |= Check("../../../Testcases/Complete/extreme/queries200.txt", "../../../Testcases/Complete/extreme/Solutions/queries200 - Solution.txt");
+                    yes |= Check("../../../Testcases/Complete/extreme/queries22.txt", "../../../Testcases/Complete/extreme/Solutions/queries22 - Solution.txt");
+                    timeAfter = System.Environment.TickCount;
+                    break;
             }
+            Console.WriteLine(yes);
+            double time = (timeAfter - timeBefore) / (1000.0 * 60.0);
+            Console.WriteLine(time.ToString() , "min");
+
         }
 
-        static string ReadMoviesFile(string fileName)
+        static string ReadFile(string fileName)
         {
             FileStream file = new(fileName, FileMode.Open, FileAccess.Read);
             StreamReader sr = new(file);
-
             string moviesData = sr.ReadToEnd();
-            
             sr.Close();
             file.Close();
-
             return moviesData;
         }
 
-        
-        static void Prepare(string moviesData)
+        static (int, int) Count(string fileName)
         {
+            int nodes = 0;
+            int edges = 0;
+            string moviesData = ReadFile(fileName);
             string[] movies = moviesData.Split("\n");
-            
-            
+
+            HashSet<string> hs = new();
+
             for (int i = 0; i < movies.Length; i++)
             {
                 string[] movieData = movies[i].Split('/');
 
-                string u = movieData[0];
-
-                if (!isActor.ContainsKey(u)) isActor.Add(u, false);
-                else isActor[u] = false;
-
-                if (!vis.ContainsKey(u)) vis.Add(u, 0);
-                else vis[u] = 0;
-
-                if (!dis.ContainsKey(u)) dis.Add(u, 0);
-                else dis[u] = 0;
-
-                if (!pre.ContainsKey(u)) pre.Add(u, "");
-                else pre[u] = "";
+                string m = movieData[0];
 
                 for (int j = 1; j < movieData.Length; j++)
                 {
-                    string v = movieData[j];
+                    string u = movieData[j];
 
-                    if (!isActor.ContainsKey(v)) isActor.Add(v, true);
-                    else isActor[v] = true;
+                    edges += 2;
 
-                    if (!vis.ContainsKey(v)) vis.Add(v, 0);
-                    else vis[v] = 0;
+                    for (int k = j + 1; k < movieData.Length; k++)
+                    {
+                        string v = movieData[k];
+                        hs.Add(v);
+                        //edges += 2;
+                    }
+                }
+            }
+            nodes = hs.Count + movies.Length;
 
-                    if (!dis.ContainsKey(v)) dis.Add(v, 0);
-                    else dis[v] = 0;
+            return (nodes, edges);
+        }
 
-                    if (!pre.ContainsKey(v)) pre.Add(v, "");
-                    else pre[v] = "";
+        static void Preproccess(string fileName)
+        {
+            AdjList = new();
+            Strength = new();
 
-                    if (!AdjList.ContainsKey(u)) AdjList.Add(u, new List<string>());
-                    if (!AdjList.ContainsKey(v)) AdjList.Add(v, new List<string>());
+            string moviesData = ReadFile(fileName);
+            string[] movies = moviesData.Split("\n");
+            
+            for (int i = 0; i < movies.Length; i++)
+            {
+                string[] movieData = movies[i].Split('/');
+                string m = movieData[0];
 
-                    AdjList[u].Add(v);
-                    AdjList[v].Add(u);
+                for (int j = 1; j < movieData.Length; j++)
+                {
+                    string u = movieData[j];
+
+                    for (int k = j+1; k < movieData.Length; k++)
+                    {
+                        string v = movieData[k];
+
+                        if (!AdjList.ContainsKey(u)) AdjList.Add(u, new List<(string, string)>());
+                        if (!AdjList.ContainsKey(v)) AdjList.Add(v, new List<(string, string)>());
+
+                        AdjList[u].Add((v, m));
+                        AdjList[v].Add((u, m));
+
+                        if (!Strength.ContainsKey((u, v))) Strength.Add((u, v), 0);
+                        if (!Strength.ContainsKey((v, u))) Strength.Add((v, u), 0);
+                        
+                        Strength[(u, v)]++;
+                        Strength[(v, u)]++;
+                    }
+                    
                 }
             }
         }
+
+        public static bool Check(string queryFile, string solutionFile)
+        {
+            Algorithms.Algorithms.Prepare(AdjList, Strength);
+
+            string tmpQueries = ReadFile(queryFile);
+            string tmpSolutions = ReadFile(solutionFile);
+
+            string[] queries = tmpQueries.Split('\n');
+
+            string[] ans = new string[(queries.Length - 1) * 5];
+            string[] ANS = tmpSolutions.Split('\n');
+
+            for (int i = 0; i < queries.Length ; i++)
+            {
+                string[] actors = queries[i].Split('/');
+                if (actors.Length < 2) continue;
+
+                string actor1 = actors[0];
+                string actor2 = actors[1];
+
+                (int, int, List<string>, List<string>) answer = Algorithms.Algorithms.Query(actor1, actor2);
+
+                int degree = answer.Item1;
+                int strength = answer.Item2;
+                List<string> actorsPath = answer.Item3;
+                List<string> moviesPath = answer.Item4;
+
+                string tmp = actor1 + "/" + actor2;
+                ans[i*5] = tmp;
+
+                tmp = "DoS = " + degree.ToString() + ", RS = " + strength.ToString();
+                ans[i*5 + 1] = tmp;
+                
+                tmp = "CHAIN OF ACTORS: ";
+                foreach(string actor in actorsPath)
+                {
+                    tmp = tmp + actor + " -> ";
+                }
+                tmp = tmp.Remove(tmp.Length - 4);
+                ans[i*5 + 2] = tmp;
+                
+                tmp = "CHAIN OF MOVIES:  =>";
+                foreach (string movie in moviesPath)
+                {
+                    tmp = tmp + " " + movie + " =>";
+                }
+                ans[i*5 + 3] = tmp;
+
+                ans[i*5 + 4] = "";
+            }
+            ans[ans.Length - 1] = "";
+
+            bool yes = true;
+
+            //List<int> l = new();
+            for (int i = 0; i < ans.Length; i++)
+            {
+                if (i % 5 == 2 || i % 5 == 3) continue;
+                Console.WriteLine(ans[i]);
+                Console.WriteLine(ANS[i]);
+                if (ans[i] != ANS[i])
+                {
+                    //l.Add(i / 5);
+                    Console.WriteLine("---------------------------------------------------------");
+                    Console.WriteLine("\nWA on test " + i.ToString() + "\n");
+                    yes = false;
+                    break;
+                }
+
+            }
+            /*
+            foreach(int i in l)
+            {
+                Console.WriteLine(i);
+            }
+            */
+            return yes;
+        }
+
     }
 }
 
