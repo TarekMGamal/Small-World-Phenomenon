@@ -19,9 +19,10 @@ namespace Program
             double timeBefore = 0, timeAfter = 0;
             bool yes = false;
 
+            /*
             timeBefore = System.Environment.TickCount;
             int cnt = 0;
-            for (long i = 0; i < 2e5; i++)
+            for (long i = 0; i < 2e4; i++)
             {
                 for (long j = 0; j < 1e7; j++)
                 {
@@ -34,6 +35,7 @@ namespace Program
 
 
             return;
+            */
             Console.WriteLine("Small-World Phenomenon:\n[1] sample\n[2] small\n[3] medium\n[4] large\n[5] extreme\n");
             Console.Write("Enter your choice [1-2-3-4-5]: ");
             char choice = Console.ReadLine()[0];
