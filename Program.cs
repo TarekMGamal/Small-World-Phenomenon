@@ -10,6 +10,7 @@ namespace Program
 {
     public class Program
     {
+        static bool optimization = true;
         static Dictionary<string, List<(string, string)>> AdjList;
         static Dictionary<(string, string), int> Strength;
 
@@ -17,14 +18,17 @@ namespace Program
         {
             double timeBefore = 0, timeAfter = 0;
             bool yes = false;
-
-
+            
             Console.WriteLine("Small-World Phenomenon:\n[1] sample\n[2] small\n[3] medium\n[4] large\n[5] extreme\n");
             Console.Write("Enter your choice [1-2-3-4-5]: ");
             char choice = Console.ReadLine()[0];
+            Console.WriteLine("\nDo you want to run with optimization?\nEnter your choice [y-n]: ");
+            char opt = Console.ReadLine()[0];
+            if (opt == 'n') optimization = false;
             switch (choice)
             {
                 case '1':
+                    Console.WriteLine("Not implemented yet\n");
                     break;
                 case '2':
                     Preproccess("../../../Testcases/Complete/small/Case1/Movies193.txt");
@@ -32,7 +36,8 @@ namespace Program
                     yes = false;
                     yes |= Check("../../../Testcases/Complete/small/Case1/queries110.txt", "../../../Testcases/Complete/small/Case1/Solution/queries110 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    double time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
                     Console.WriteLine(yes);
 
                     Preproccess("../../../Testcases/Complete/small/Case2/Movies187.txt");
@@ -40,7 +45,8 @@ namespace Program
                     yes = false;
                     yes |= Check("../../../Testcases/Complete/small/Case2/queries50.txt", "../../../Testcases/Complete/small/Case2/Solution/queries50 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
                     Console.WriteLine(yes);
                     break;
                 case '3':
@@ -49,14 +55,16 @@ namespace Program
                     yes = false;
                     yes |= Check("../../../Testcases/Complete/medium/Case1/queries4000.txt", "../../../Testcases/Complete/medium/Case1/Solutions/queries4000 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
                     Console.WriteLine(yes);
 
                     timeBefore = System.Environment.TickCount;
                     yes = false;
                     yes |= Check("../../../Testcases/Complete/medium/Case1/queries85.txt", "../../../Testcases/Complete/medium/Case1/Solutions/queries85 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
                     Console.WriteLine(yes);
 
                     Preproccess("../../../Testcases/Complete/medium/Case2/Movies4736.txt");
@@ -65,14 +73,16 @@ namespace Program
                     yes = false;
                     yes |= Check("../../../Testcases/Complete/medium/Case2/queries2000.txt", "../../../Testcases/Complete/medium/Case2/Solutions/queries2000 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
                     Console.WriteLine(yes);
 
                     timeBefore = System.Environment.TickCount;
                     yes = false;
                     yes |= Check("../../../Testcases/Complete/medium/Case2/queries110.txt", "../../../Testcases/Complete/medium/Case2/Solutions/queries110 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
                     Console.WriteLine(yes);
                     break;
                 case '4':
@@ -81,14 +91,16 @@ namespace Program
                     yes = false;
                     yes |= Check("../../../Testcases/Complete/large/queries26.txt", "../../../Testcases/Complete/large/Solutions/queries26 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
                     Console.WriteLine(yes);
 
                     timeBefore = System.Environment.TickCount;
                     yes = false;
                     yes |= Check("../../../Testcases/Complete/large/queries600.txt", "../../../Testcases/Complete/large/Solutions/queries600 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
                     Console.WriteLine(yes);
                     break;
                 case '5':
@@ -96,12 +108,16 @@ namespace Program
                     timeBefore = System.Environment.TickCount;
                     yes |= Check("../../../Testcases/Complete/extreme/queries200.txt", "../../../Testcases/Complete/extreme/Solutions/queries200 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
+                    Console.WriteLine(yes);
 
                     timeBefore = System.Environment.TickCount;
                     yes |= Check("../../../Testcases/Complete/extreme/queries22.txt", "../../../Testcases/Complete/extreme/Solutions/queries22 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
-                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    time = (timeAfter - timeBefore) / (60000);
+                    Console.WriteLine(time.ToString() + " min");
+                    Console.WriteLine(yes);
                     break;
             }
 
@@ -115,18 +131,6 @@ namespace Program
             sr.Close();
             file.Close();
             return moviesData;
-        }
-
-        static void Count()
-        {
-            int mx = 0;
-            foreach (var entry in AdjList)
-            {
-                List<(string, string)> list = entry.Value;
-                mx = Math.Max(mx, list.Count());
-                //Console.WriteLine(list.Count);
-            }
-            Console.WriteLine(mx);
         }
 
         static void Preproccess(string fileName)
@@ -169,11 +173,8 @@ namespace Program
 
         public static bool Check(string queryFile, string solutionFile)
         {
-
-            //double timeBefore = System.Environment.TickCount;
             Algorithms.Algorithms.Prepare(AdjList, Strength);
-            //double timeAfter = System.Environment.TickCount;
-
+            
             string tmpQueries = ReadFile(queryFile);
             string tmpSolutions = ReadFile(solutionFile);
 
@@ -191,7 +192,7 @@ namespace Program
                 string actor2 = actors[1];
 
                 double timeBefore = System.Environment.TickCount;
-                (int, int, List<string>, List<string>) answer = Algorithms.Algorithms.Query(actor1, actor2);
+                (int, int, List<string>, List<string>) answer = Algorithms.Algorithms.Query(actor1, actor2, optimization);
                 double timeAfter = System.Environment.TickCount;
 
                 double time = (timeAfter - timeBefore) / (1000.0 * 60.0);
@@ -229,28 +230,20 @@ namespace Program
 
             bool yes = true;
 
-            //List<int> l = new();
             for (int i = 0; i < ans.Length; i++)
             {
-                if (i % 5 == 2 || i % 5 == 3) continue;
                 //Console.WriteLine(ans[i]);
                 //Console.WriteLine(ANS[i]);
                 if (ans[i] != ANS[i])
                 {
-                    //l.Add(i / 5);
-                    //Console.WriteLine("---------------------------------------------------------");
-                    //Console.WriteLine("\nWA on test " + i.ToString() + "\n");
+                    if (i % 5 == 2 || i % 5 == 3) continue;
+                    Console.WriteLine("---------------------------------------------------------");
+                    Console.WriteLine("\nWA on test " + i.ToString() + "\n");
                     yes = false;
-                    //break;
+                    break;
                 }
 
             }
-            /*
-            foreach(int i in l)
-            {
-                Console.WriteLine(i);
-            }
-            */
             return yes;
         }
 

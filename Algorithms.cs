@@ -24,7 +24,7 @@ namespace Algorithms
             DirectStrength = strength;
         }
 
-        private static (int, int) Dijk(string source, string destination)
+        private static (int, int) Dijk(string source, string destination, bool optimization)
         {
             var Pq = new C5.IntervalHeap<(int, int, string, string)>();
             Pq.Add((0, 0, source, ""));
@@ -42,18 +42,24 @@ namespace Algorithms
                 int curDegree = tmp.Item1;
                 int curStrength = -tmp.Item2;
 
+                // optimization
                 if (node == destination)
                 {
                     finalMovie = nodeMovieName;
-                    break;
+                    if (optimization) break;
                 }
-                if (curDegree > Distance[node] || curDegree > Distance[destination]) continue;
+                if (optimization)
+                {
+                    if (curDegree > Distance[node] || curDegree > Distance[destination]) continue;
+                }
 
+                // looping through children
                 foreach (var entry in AdjList[node])
                 {
                     string child = entry.Item1;
                     string childMovieName = entry.Item2;
 
+                    // calculate new degree & strength
                     int newDegree = curDegree + 1;
                     int newStrength = curStrength + DirectStrength[(node, child)];
 
@@ -62,16 +68,20 @@ namespace Algorithms
 
                     if (newDegree < Distance[child] || (newDegree == Distance[child] && newStrength > Strength[child]))
                     {
+                        // new optimal edge found
+
+                        // push the new optimal edge in priority queue
                         var temp = (newDegree, -newStrength, child, childMovieName);
                         Pq.Add(temp);
 
+                        // update Distance & Strength dictionaries
                         Distance[child] = newDegree;
                         Strength[child] = newStrength;
 
+                        // update PrevNode & PrevMovie dictionaries
                         if (!PrevNode.ContainsKey(child)) PrevNode.Add(child, "");
-                        PrevNode[child] = node;
-
                         if (!PrevMovie.ContainsKey(childMovieName)) PrevMovie.Add(childMovieName, "");
+                        PrevNode[child] = node;
                         PrevMovie[childMovieName] = nodeMovieName;
                     }
                 }
@@ -82,6 +92,10 @@ namespace Algorithms
 
         private static (List<string>, List<string>) GetPath(string actor1, string actor2)
         {
+            // PrevNode dictionary contains the previous node of every node in the optimal path
+            // PrevMovie dictionary contains the previous movie of every movie in the optimal path
+            // starting from the destination we traverse back using these dictionaries till we reach the source
+
             List<string> moviesPath = new();
             List<string> actorsPath = new();
 
@@ -90,10 +104,14 @@ namespace Algorithms
 
             do
             {
+                // the previous of source is always empty string
+                // that means we reached the source
                 if (node == "") break;
 
+                // add node to the nodes list
                 actorsPath.Add(node);
 
+                // go to previous node
                 if (!PrevNode.ContainsKey(node)) PrevNode.Add(node, "");
                 node = PrevNode[node];
             }
@@ -101,30 +119,34 @@ namespace Algorithms
 
             do
             {
+                // the previous of source is always empty string
+                // that means we reached the source
                 if (movie == "") break;
 
+                // add movie to the movies list
                 moviesPath.Add(movie);
 
+                // go to previous movie
                 if (!PrevMovie.ContainsKey(movie)) PrevMovie.Add(movie, "");
                 movie = PrevMovie[movie];
             }
             while (true);
 
-
+            // after we put every node and movie in thier lists we reverse them to be in required order
             actorsPath.Reverse();
             moviesPath.Reverse();
 
             return (actorsPath, moviesPath);
         }
 
-        public static (int, int, List<string>, List<string>) Query(string actor1, string actor2)
+        public static (int, int, List<string>, List<string>) Query(string actor1, string actor2, bool optimization)
         {
             Distance = new();
             Strength = new();
             PrevMovie = new();
             PrevNode = new();
 
-            (int, int) ans = Dijk(actor1, actor2);
+            (int, int) ans = Dijk(actor1, actor2, optimization);
             int degree = ans.Item1;
             int strength = ans.Item2;
 
