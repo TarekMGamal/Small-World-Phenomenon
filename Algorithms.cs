@@ -15,8 +15,6 @@ namespace Algorithms
         static Dictionary<string, string> PrevMovie = new();
         static Dictionary<string, int> Distance = new();
         static Dictionary<string, int> Strength = new();
-        static List<string> moviesPath = new();
-        static List<string> actorsPath = new();
         static Dictionary<(string, string), int> DirectStrength;
 
 
@@ -84,26 +82,34 @@ namespace Algorithms
 
         private static (List<string>, List<string>) GetPath(string actor1, string actor2)
         {
-            PrevNode.Clear();
-            PrevMovie.Clear();
+            List<string> moviesPath = new();
+            List<string> actorsPath = new();
 
             string node = actor2;
             string movie = finalMovie;
 
-            while (node != "") {
+            do
+            {
+                if (node == "") break;
+
                 actorsPath.Add(node);
 
                 if (!PrevNode.ContainsKey(node)) PrevNode.Add(node, "");
                 node = PrevNode[node];
             }
+            while (true);
 
-            while (movie != "")
+            do
             {
-                actorsPath.Add(movie);
+                if (movie == "") break;
+
+                moviesPath.Add(movie);
 
                 if (!PrevMovie.ContainsKey(movie)) PrevMovie.Add(movie, "");
                 movie = PrevMovie[movie];
             }
+            while (true);
+
 
             actorsPath.Reverse();
             moviesPath.Reverse();
@@ -113,17 +119,17 @@ namespace Algorithms
 
         public static (int, int, List<string>, List<string>) Query(string actor1, string actor2)
         {
-            Distance.Clear();
-            Strength.Clear();
-            PrevNode.Clear();
-            PrevMovie.Clear();
+            Distance = new();
+            Strength = new();
+            PrevMovie = new();
+            PrevNode = new();
 
             (int, int) ans = Dijk(actor1, actor2);
             int degree = ans.Item1;
             int strength = ans.Item2;
 
             (List<string>, List<string>) paths = GetPath(actor1, actor2);
-            
+
             return (degree, strength, paths.Item1, paths.Item2);
         }
     }
