@@ -10,32 +10,15 @@ namespace Program
 {
     public class Program
     {
-        static double totalTime = 0;
         static Dictionary<string, List<(string, string)>> AdjList;
-        static Dictionary<(string, string) , int> Strength;
+        static Dictionary<(string, string), int> Strength;
 
         static void Main(string[] args)
         {
             double timeBefore = 0, timeAfter = 0;
             bool yes = false;
 
-            /*
-            timeBefore = System.Environment.TickCount;
-            int cnt = 0;
-            for (long i = 0; i < 2e4; i++)
-            {
-                for (long j = 0; j < 1e7; j++)
-                {
-                    cnt++;
-                }
-            }
-            Console.WriteLine(cnt);
-            timeAfter = System.Environment.TickCount;
-            Console.WriteLine((timeAfter - timeBefore) / (60000));
 
-
-            return;
-            */
             Console.WriteLine("Small-World Phenomenon:\n[1] sample\n[2] small\n[3] medium\n[4] large\n[5] extreme\n");
             Console.Write("Enter your choice [1-2-3-4-5]: ");
             char choice = Console.ReadLine()[0];
@@ -44,58 +27,83 @@ namespace Program
                 case '1':
                     break;
                 case '2':
-                    timeBefore = System.Environment.TickCount;
                     Preproccess("../../../Testcases/Complete/small/Case1/Movies193.txt");
+                    timeBefore = System.Environment.TickCount;
+                    yes = false;
                     yes |= Check("../../../Testcases/Complete/small/Case1/queries110.txt", "../../../Testcases/Complete/small/Case1/Solution/queries110 - Solution.txt");
+                    timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    Console.WriteLine(yes);
+
                     Preproccess("../../../Testcases/Complete/small/Case2/Movies187.txt");
+                    timeBefore = System.Environment.TickCount;
+                    yes = false;
                     yes |= Check("../../../Testcases/Complete/small/Case2/queries50.txt", "../../../Testcases/Complete/small/Case2/Solution/queries50 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    Console.WriteLine(yes);
                     break;
                 case '3':
-                    
                     Preproccess("../../../Testcases/Complete/medium/Case1/Movies967.txt");
-                    //timeBefore = System.Environment.TickCount;
+                    timeBefore = System.Environment.TickCount;
+                    yes = false;
                     yes |= Check("../../../Testcases/Complete/medium/Case1/queries4000.txt", "../../../Testcases/Complete/medium/Case1/Solutions/queries4000 - Solution.txt");
-                    //timeAfter = System.Environment.TickCount;
-                    //Console.WriteLine((timeAfter - timeBefore) / (1000 * 60));
+                    timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    Console.WriteLine(yes);
 
-                    //timeBefore = System.Environment.TickCount;
+                    timeBefore = System.Environment.TickCount;
+                    yes = false;
                     yes |= Check("../../../Testcases/Complete/medium/Case1/queries85.txt", "../../../Testcases/Complete/medium/Case1/Solutions/queries85 - Solution.txt");
-                    //timeAfter = System.Environment.TickCount;
-                    //Console.WriteLine((timeAfter - timeBefore) / (1000 * 60));
+                    timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    Console.WriteLine(yes);
 
                     Preproccess("../../../Testcases/Complete/medium/Case2/Movies4736.txt");
-                    
-                    //timeBefore = System.Environment.TickCount;
+
+                    timeBefore = System.Environment.TickCount;
+                    yes = false;
                     yes |= Check("../../../Testcases/Complete/medium/Case2/queries2000.txt", "../../../Testcases/Complete/medium/Case2/Solutions/queries2000 - Solution.txt");
-                    //timeAfter = System.Environment.TickCount;
-                    //Console.WriteLine((timeAfter - timeBefore) / (1000 * 60));
+                    timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    Console.WriteLine(yes);
 
-                    //timeBefore = System.Environment.TickCount;
+                    timeBefore = System.Environment.TickCount;
+                    yes = false;
                     yes |= Check("../../../Testcases/Complete/medium/Case2/queries110.txt", "../../../Testcases/Complete/medium/Case2/Solutions/queries110 - Solution.txt");
-                    //timeAfter = System.Environment.TickCount;
-                    //Console.WriteLine((timeAfter - timeBefore) / (1000 * 60));
-
+                    timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    Console.WriteLine(yes);
                     break;
                 case '4':
-                    timeBefore = System.Environment.TickCount;
                     Preproccess("../../../Testcases/Complete/large/Movies14129.txt");
+                    timeBefore = System.Environment.TickCount;
+                    yes = false;
                     yes |= Check("../../../Testcases/Complete/large/queries26.txt", "../../../Testcases/Complete/large/Solutions/queries26 - Solution.txt");
+                    timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    Console.WriteLine(yes);
+
+                    timeBefore = System.Environment.TickCount;
+                    yes = false;
                     yes |= Check("../../../Testcases/Complete/large/queries600.txt", "../../../Testcases/Complete/large/Solutions/queries600 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+                    Console.WriteLine(yes);
                     break;
                 case '5':
-                    timeBefore = System.Environment.TickCount;
                     Preproccess("../../../Testcases/Complete/extreme/Movies122806.txt");
-                    //Count();
+                    timeBefore = System.Environment.TickCount;
                     yes |= Check("../../../Testcases/Complete/extreme/queries200.txt", "../../../Testcases/Complete/extreme/Solutions/queries200 - Solution.txt");
+                    timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
+
+                    timeBefore = System.Environment.TickCount;
                     yes |= Check("../../../Testcases/Complete/extreme/queries22.txt", "../../../Testcases/Complete/extreme/Solutions/queries22 - Solution.txt");
                     timeAfter = System.Environment.TickCount;
+                    Console.WriteLine((timeAfter - timeBefore) / (60000));
                     break;
             }
-            Console.WriteLine(yes);
-            double time = (timeAfter - timeBefore) / (1000.0 * 60.0);
-            Console.WriteLine(time.ToString() , "min");
 
         }
 
@@ -112,7 +120,7 @@ namespace Program
         static void Count()
         {
             int mx = 0;
-            foreach(var entry in AdjList)
+            foreach (var entry in AdjList)
             {
                 List<(string, string)> list = entry.Value;
                 mx = Math.Max(mx, list.Count());
@@ -128,7 +136,7 @@ namespace Program
 
             string moviesData = ReadFile(fileName);
             string[] movies = moviesData.Split("\n");
-            
+
             for (int i = 0; i < movies.Length; i++)
             {
                 string[] movieData = movies[i].Split('/');
@@ -138,7 +146,7 @@ namespace Program
                 {
                     string u = movieData[j];
 
-                    for (int k = j+1; k < movieData.Length; k++)
+                    for (int k = j + 1; k < movieData.Length; k++)
                     {
                         string v = movieData[k];
 
@@ -150,11 +158,11 @@ namespace Program
 
                         if (!Strength.ContainsKey((u, v))) Strength.Add((u, v), 0);
                         if (!Strength.ContainsKey((v, u))) Strength.Add((v, u), 0);
-                        
+
                         Strength[(u, v)]++;
                         Strength[(v, u)]++;
                     }
-                    
+
                 }
             }
         }
@@ -163,7 +171,7 @@ namespace Program
         {
 
             //double timeBefore = System.Environment.TickCount;
-            Algorithms.Algorithms.Prepare(AdjList);
+            Algorithms.Algorithms.Prepare(AdjList, Strength);
             //double timeAfter = System.Environment.TickCount;
 
             string tmpQueries = ReadFile(queryFile);
@@ -171,8 +179,10 @@ namespace Program
 
             string[] queries = tmpQueries.Split('\n');
 
-            totalTime = 0;
-            for (int i = 0; i < queries.Length ; i++)
+            string[] ans = new string[(queries.Length - 1) * 5];
+            string[] ANS = tmpSolutions.Split('\n');
+
+            for (int i = 0; i < queries.Length; i++)
             {
                 string[] actors = queries[i].Split('/');
                 if (actors.Length < 2) continue;
@@ -181,15 +191,67 @@ namespace Program
                 string actor2 = actors[1];
 
                 double timeBefore = System.Environment.TickCount;
-                (int, int) answer = Algorithms.Algorithms.Query(actor1, actor2);
+                (int, int, List<string>, List<string>) answer = Algorithms.Algorithms.Query(actor1, actor2);
                 double timeAfter = System.Environment.TickCount;
 
                 double time = (timeAfter - timeBefore) / (1000.0 * 60.0);
-                totalTime += time;
+                //Console.WriteLine("Query " + i.ToString() + ": " + time.ToString() + " min");
+
+                int degree = answer.Item1;
+                int strength = answer.Item2;
+                List<string> actorsPath = answer.Item3;
+                List<string> moviesPath = answer.Item4;
+
+                string tmp = actor1 + "/" + actor2;
+                ans[i * 5] = tmp;
+
+                tmp = "DoS = " + degree.ToString() + ", RS = " + strength.ToString();
+                ans[i * 5 + 1] = tmp;
+
+                tmp = "CHAIN OF ACTORS: ";
+                foreach (string actor in actorsPath)
+                {
+                    tmp = tmp + actor + " -> ";
+                }
+                tmp = tmp.Remove(tmp.Length - 4);
+                ans[i * 5 + 2] = tmp;
+
+                tmp = "CHAIN OF MOVIES:  =>";
+                foreach (string movie in moviesPath)
+                {
+                    tmp = tmp + " " + movie + " =>";
+                }
+                ans[i * 5 + 3] = tmp;
+
+                ans[i * 5 + 4] = "";
             }
-            Console.WriteLine(totalTime);
-            
-            return true;
+            ans[ans.Length - 1] = "";
+
+            bool yes = true;
+
+            //List<int> l = new();
+            for (int i = 0; i < ans.Length; i++)
+            {
+                if (i % 5 == 2 || i % 5 == 3) continue;
+                //Console.WriteLine(ans[i]);
+                //Console.WriteLine(ANS[i]);
+                if (ans[i] != ANS[i])
+                {
+                    //l.Add(i / 5);
+                    //Console.WriteLine("---------------------------------------------------------");
+                    //Console.WriteLine("\nWA on test " + i.ToString() + "\n");
+                    yes = false;
+                    //break;
+                }
+
+            }
+            /*
+            foreach(int i in l)
+            {
+                Console.WriteLine(i);
+            }
+            */
+            return yes;
         }
 
     }
