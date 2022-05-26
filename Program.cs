@@ -141,6 +141,7 @@ namespace Program
             string moviesData = ReadFile(fileName);
             string[] movies = moviesData.Split("\n");
 
+            // O(n * m^2)
             for (int i = 0; i < movies.Length; i++)
             {
                 string[] movieData = movies[i].Split('/');
@@ -240,7 +241,7 @@ namespace Program
                     Console.WriteLine("---------------------------------------------------------");
                     Console.WriteLine("\nWA on test " + i.ToString() + "\n");
                     yes = false;
-                    break;
+                    //break;
                 }
 
             }

@@ -16,26 +16,27 @@ namespace Algorithms
         static Dictionary<string, int> Distance = new();
         static Dictionary<string, int> Strength = new();
         static Dictionary<(string, string), int> DirectStrength;
-
-
+        
+        // O(n)
         public static void Prepare(Dictionary<string, List<(string, string)>> adjList, Dictionary<(string, string), int> strength)
         {
-            AdjList = adjList;
-            DirectStrength = strength;
+            AdjList = adjList; // O(n)
+            DirectStrength = strength; // O(n)
         }
 
+        // O(E log(V))
         private static (int, int) Dijk(string source, string destination, bool optimization)
         {
             var Pq = new C5.IntervalHeap<(int, int, string, string)>();
-            Pq.Add((0, 0, source, ""));
+            Pq.Add((0, 0, source, "")); // O(log(V))
 
-            Distance.Add(source, 0);
-            Distance.Add(destination, inf);
-            Strength.Add(source, 0);
+            Distance.Add(source, 0); // O(1)
+            Distance.Add(destination, inf); // O(1)
+            Strength.Add(source, 0); // O(1)
 
             while (Pq.Count > 0)
             {
-                var tmp = Pq.DeleteMin();
+                var tmp = Pq.DeleteMin(); // O(log(V))
 
                 string node = tmp.Item3;
                 string nodeMovieName = tmp.Item4;
@@ -50,39 +51,39 @@ namespace Algorithms
                 }
                 if (optimization)
                 {
-                    if (curDegree > Distance[node] || curDegree > Distance[destination]) continue;
+                    if (curDegree > Distance[node] || curDegree > Distance[destination]) continue; // O(1)
                 }
 
                 // looping through children
-                foreach (var entry in AdjList[node])
+                foreach (var entry in AdjList[node]) // O(length of AdjList[node])
                 {
                     string child = entry.Item1;
                     string childMovieName = entry.Item2;
 
                     // calculate new degree & strength
-                    int newDegree = curDegree + 1;
-                    int newStrength = curStrength + DirectStrength[(node, child)];
+                    int newDegree = curDegree + 1; // O(1)
+                    int newStrength = curStrength + DirectStrength[(node, child)]; // O(1)
 
-                    if (!Distance.ContainsKey(child)) Distance.Add(child, inf);
-                    if (!Strength.ContainsKey(child)) Strength.Add(child, 0);
+                    if (!Distance.ContainsKey(child)) Distance.Add(child, inf); // O(1)
+                    if (!Strength.ContainsKey(child)) Strength.Add(child, 0); // O(1)
 
-                    if (newDegree < Distance[child] || (newDegree == Distance[child] && newStrength > Strength[child]))
+                    if (newDegree < Distance[child] || (newDegree == Distance[child] && newStrength > Strength[child])) // O(1)
                     {
                         // new optimal edge found
 
                         // push the new optimal edge in priority queue
                         var temp = (newDegree, -newStrength, child, childMovieName);
-                        Pq.Add(temp);
+                        Pq.Add(temp); // O(log(V))
 
                         // update Distance & Strength dictionaries
-                        Distance[child] = newDegree;
-                        Strength[child] = newStrength;
+                        Distance[child] = newDegree; // O(1)
+                        Strength[child] = newStrength; // O(1)
 
                         // update PrevNode & PrevMovie dictionaries
-                        if (!PrevNode.ContainsKey(child)) PrevNode.Add(child, "");
-                        if (!PrevMovie.ContainsKey(childMovieName)) PrevMovie.Add(childMovieName, "");
-                        PrevNode[child] = node;
-                        PrevMovie[childMovieName] = nodeMovieName;
+                        if (!PrevNode.ContainsKey(child)) PrevNode.Add(child, ""); // O(1)
+                        if (!PrevMovie.ContainsKey(childMovieName)) PrevMovie.Add(childMovieName, ""); // O(1)
+                        PrevNode[child] = node; // O(1)
+                        PrevMovie[childMovieName] = nodeMovieName; // O(1)
                     }
                 }
             }
@@ -90,7 +91,9 @@ namespace Algorithms
             return (Distance[destination], Strength[destination]);
         }
 
-        private static (List<string>, List<string>) GetPath(string actor1, string actor2)
+        // suppose K is length of optimal path
+        // O(K)
+        private static (List<string>, List<string>) GetPath(string actor2)
         {
             // PrevNode dictionary contains the previous node of every node in the optimal path
             // PrevMovie dictionary contains the previous movie of every movie in the optimal path
@@ -98,10 +101,11 @@ namespace Algorithms
 
             List<string> moviesPath = new();
             List<string> actorsPath = new();
-
+            
             string node = actor2;
             string movie = finalMovie;
 
+            // O(K)
             do
             {
                 // the previous of source is always empty string
@@ -117,6 +121,7 @@ namespace Algorithms
             }
             while (true);
 
+            // O(K)
             do
             {
                 // the previous of source is always empty string
@@ -133,24 +138,27 @@ namespace Algorithms
             while (true);
 
             // after we put every node and movie in thier lists we reverse them to be in required order
-            actorsPath.Reverse();
-            moviesPath.Reverse();
+            actorsPath.Reverse(); // O(K)
+            moviesPath.Reverse(); // O(K)
 
             return (actorsPath, moviesPath);
         }
 
+        // O(E log(V))
         public static (int, int, List<string>, List<string>) Query(string actor1, string actor2, bool optimization)
         {
+            // Wrapper and starter function to call other functions and return the reqs
+            
             Distance = new();
             Strength = new();
             PrevMovie = new();
             PrevNode = new();
-
-            (int, int) ans = Dijk(actor1, actor2, optimization);
+            
+            (int, int) ans = Dijk(actor1, actor2, optimization); // O(E log(V))
             int degree = ans.Item1;
             int strength = ans.Item2;
 
-            (List<string>, List<string>) paths = GetPath(actor1, actor2);
+            (List<string>, List<string>) paths = GetPath(actor2); // O(K)
 
             return (degree, strength, paths.Item1, paths.Item2);
         }
